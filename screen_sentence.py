@@ -19,13 +19,10 @@ WHITE = 255,255,255
 screen.fill(WHITE)
 
 
-def word_colour(word):
-    ''' given a word, find the colour for syntax hilighting '''
-
-    tag = nltk.pos_tag([word])[0]
+def word_colour(tag):
+    ''' given a tag, find the colour for syntax hilighting '''
 
     logger.info(tag)
-
     return word_class.TAGS.get(tag[1], word_class.DEFAULT).colour
 
 
@@ -83,6 +80,8 @@ def keydown(event):
     antialias = True
 
     tokens = nltk.word_tokenize(TEXT)
+    tags = nltk.pos_tag(tokens)
+
     # add back spaces that tokenize removed
     words = []
     total = ''
@@ -93,8 +92,8 @@ def keydown(event):
         total = total+token
 
     prev_word_end = position[0]
-    for word in words:
-        label = font.render(word, antialias, word_colour(word.strip()))
+    for word, tag in zip(words, tags):
+        label = font.render(word, antialias, word_colour(tag))
         word_position = (prev_word_end, position[1])
         screen.blit(label, word_position)
         prev_word_end += font.size(word)[0]
