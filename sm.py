@@ -1,6 +1,10 @@
+import re
 import sys
 import pygame
+import nltk
 import logging
+
+import word_class
 
 logging.basicConfig(format='%(asctime)s File %(name)s, line %(lineno)d, %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -17,8 +21,12 @@ screen.fill(WHITE)
 
 def word_colour(word):
     ''' given a word, find the colour for syntax hilighting '''
-    import random
-    return (random.randint(0,255), random.randint(0,255), random.randint(0,55))
+
+    tag = nltk.pos_tag([word])[0]
+
+    logger.info(tag)
+
+    return word_class.TAGS.get(tag[1], word_class.DEFAULT).colour
 
 
 def exit(event):
@@ -74,8 +82,15 @@ def keydown(event):
 
     antialias = True
 
-    words = TEXT.split()
-    words = [w + ' ' for w in words[:-1]] + [words[-1]]
+    tokens = nltk.word_tokenize(TEXT)
+    # add back spaces that tokenize removed
+    words = []
+    total = ''
+    for i, token in enumerate(tokens):
+        if re.match(re.escape(total)+re.escape(token)+' ', TEXT):
+            token = token + ' '
+        words.append(token)
+        total = total+token
 
     prev_word_end = position[0]
     for word in words:
