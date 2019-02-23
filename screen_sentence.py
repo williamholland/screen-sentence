@@ -12,8 +12,7 @@ logger.setLevel('DEBUG')
 
 pygame.init()
 
-infoObject = pygame.display.Info()
-screen = pygame.display.set_mode((infoObject.current_w, infoObject.current_h))
+screen = pygame.display.set_mode((600, 400), pygame.RESIZABLE)
 BLACK = 0,0,0
 WHITE = 255,255,255
 screen.fill(WHITE)
@@ -40,8 +39,10 @@ def get_font(text):
         get the font, find the fontsize that will fill the screen
         get the position that will centre this text on the screen
     '''
-    infoObject = pygame.display.Info()
-    screen_w, screen_h = infoObject.current_w, infoObject.current_h
+    #infoObject = pygame.display.Info()
+    #screen_w, screen_h = infoObject.current_w, infoObject.current_h
+    screen_w, screen_h = pygame.display.get_surface().get_size()
+    logger.info( 'screen size: %s, %s', screen_w, screen_h)
     test_font = pygame.font.SysFont("LiberationSans", 10)
     ratio = (test_font.size(TEXT)[0] / float(len(TEXT))) / 10.0
     font_size = int(round(min((screen_w/ratio) / len(TEXT), screen_h )))
@@ -69,6 +70,19 @@ def keydown(event):
         TEXT = ''
     else:
         TEXT = TEXT + event.unicode
+
+    redraw()
+
+
+def resize(event):
+    global screen
+    logger.info('resize %s', event.size)
+    screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
+    redraw()
+
+
+def redraw():
+    global TEXT
 
     screen.fill(WHITE)
 
@@ -102,6 +116,7 @@ def keydown(event):
 EVENTS = {
     pygame.QUIT: exit,
     pygame.KEYDOWN: keydown,
+    pygame.VIDEORESIZE: resize,
 }
 
 
