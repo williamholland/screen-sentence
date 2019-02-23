@@ -14,9 +14,17 @@ BLACK = 0,0,0
 WHITE = 255,255,255
 screen.fill(WHITE)
 
+
+def word_colour(word):
+    ''' given a word, find the colour for syntax hilighting '''
+    import random
+    return (random.randint(0,255), random.randint(0,255), random.randint(0,55))
+
+
 def exit(event):
     logger.info('exit')
     sys.exit()
+
 
 def noop(*args, **kwargs):
     pass
@@ -65,17 +73,23 @@ def keydown(event):
     position, font = get_font(TEXT)
 
     antialias = True
-    label = font.render(TEXT, antialias, BLACK)
-    screen.blit(label, position)
+
+    words = TEXT.split()
+    words = [w + ' ' for w in words[:-1]] + [words[-1]]
+
+    prev_word_end = position[0]
+    for word in words:
+        label = font.render(word, antialias, word_colour(word.strip()))
+        word_position = (prev_word_end, position[1])
+        screen.blit(label, word_position)
+        prev_word_end += font.size(word)[0]
 
 
-#FPS = 30
 EVENTS = {
     pygame.QUIT: exit,
     pygame.KEYDOWN: keydown,
 }
 
-#myfont = pygame.font.SysFont("monospace", TEXT_SIZE)
 
 clock = pygame.time.Clock()
 pygame.display.update()
@@ -83,4 +97,3 @@ while True:
     for event in pygame.event.get():
         EVENTS.get(event.type, noop)(event)
     pygame.display.update()
-    #clock.tick(FPS)
