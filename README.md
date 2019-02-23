@@ -10,7 +10,7 @@ Designed as an EFL teaching aid that allows for impromptu live demonstrations.
     * pygame
     * nltk
 
-![screenshot.png](https://github.com/williamholland/screen-sentence/blob/master/img/screenshot.png)
+![demo.gif](https://github.com/williamholland/screen-sentence/blob/master/img/demo.gif)
 
 # TODO
 
