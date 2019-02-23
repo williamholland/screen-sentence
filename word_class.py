@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+BLACK = (0,0,0)
+
 # colour scheme
 # https://www.color-hex.com/color-palette/73968
 CS = {
@@ -17,7 +19,7 @@ WordClass = namedtuple(
 )
 WordClass.__new__.__defaults__ = ('no description', CS['default'])
 
-DEFAULT = WordClass()
+DEFAULT = WordClass('not a word', BLACK)
 
 TAGS = {
     "CC":   WordClass("coordinating conjunction",),
@@ -55,3 +57,22 @@ TAGS = {
     "WP":   WordClass("wh- pronoun (who)",),
     "WRB":  WordClass("wh- adverb (how) ",),
 }
+
+
+def random_tag_colours():
+    ''' Assign a random colour to every different tag
+
+        this is a bit hacky but useful for quick demo, ideally I'd like a defined colourscheme that is manually added to all the tags.
+    '''
+    import random
+    for key, tag in TAGS.items():
+        TAGS[key] = WordClass(
+            tag.desc,
+            (
+                random.randint(0,255),
+                random.randint(0,255),
+                random.randint(0,255),
+            )
+        )
+
+random_tag_colours()
