@@ -1,30 +1,30 @@
 TAG	DESCRIPTION	COLOUR
-DEFAULT	default colour	85,87,83
-CC	coordinating conjunction	85,87,83
-CD	cardinal digit	85,87,83
+DEFAULT	default colour	153,153,153
+CC	coordinating conjunction	153,153,153
+CD	cardinal digit	153,153,153
 DT	determiner	238,59,59
 EX	existential there	238,59,60
-FW	foreign word	85,87,83
+FW	foreign word	153,153,153
 IN	preposition/subordinating conjunction	127,255,0
 JJ	adjective (large)	114,159,207
 JJR	adjective, comparative (larger)	32,74,135
 JJS	adjective, superlative (largest)	114,159,207
-LS	list market	85,87,83
+LS	list market	153,153,153
 MD	modal (could, will)	102,205,0
 NN	noun, singular (cat, tree)	255,64,64
 NNS	noun plural (desks)	255,64,64
 NNP	proper noun, singular (sarah)	255,64,64
 NNPS	proper noun, plural (indians or americans)	255,64,64
-PDT	predeterminer (all, both, half)	85,87,83
+PDT	predeterminer (all, both, half)	153,153,153
 POS	possessive ending (parent's)	205,51,51
 PRP	personal pronoun (hers, herself, him,himself)	238,59,59
 PRP$	possessive pronoun (her, his, mine, my, our )	205,51,51
 RB	adverb (occasionally, swiftly)	173,127,168
 RBR	adverb, comparative (greater)	92,53,102
 RBS	adverb, superlative (biggest)	173,127,168
-RP	particle (about)	85,87,83
+RP	particle (about)	153,153,153
 TO	infinite marker (to)	127,255,0
-UH	interjection (goodbye)	85,87,83
+UH	interjection (goodbye)	153,153,153
 VB	verb (ask)	118,238,0
 VBG	verb gerund (judging)	118,238,0
 VBD	verb past tense (pleaded)	118,238,0
