@@ -17,15 +17,18 @@ BLACK = 0,0,0
 WHITE = 255,255,255
 screen.fill(WHITE)
 
+TAGS = word_class.create_tags_from_csv('word_class.csv')
 
 def word_colour(tag):
     ''' given a tag, find the colour for syntax hilighting '''
 
-    return word_class.TAGS.get(tag[1], word_class.DEFAULT).colour
+    try:
+        return TAGS.get(tag[1], TAGS['DEFAULT']).colour
+    except KeyError:
+        return BLACK
 
 
 def exit(event):
-    logger.info('exit')
     sys.exit()
 
 

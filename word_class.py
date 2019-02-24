@@ -9,16 +9,25 @@ WordClass = namedtuple(
 )
 WordClass.__new__.__defaults__ = ('no description', BLACK)
 
-DEFAULT = WordClass('not a word', BLACK)
-
-TAGS = {}
 
 def format_colour(s):
-    ''' (str,) -> (int, int, int) '''
+    ''' (str,) -> (int, int, int)
+
+        take a colour format from the csv which is 3 numbers , separated and
+        return a pygame colour.
+    '''
     return tuple( int(i) for i in s.split(',') )
 
-with open('word_class.csv') as csvfile:
-    reader = csv.DictReader(csvfile, delimiter='\t')
-    for row in reader:
-        print row
-        TAGS[row['TAG']] = WordClass(row['DESCRIPTION'], format_colour(row['COLOUR']))
+
+def create_tags_from_csv(f_name):
+    ''' (str,) -> dict of WordClass
+
+        read a csv and return WordClass tuples
+    '''
+    tags = {}
+    with open(f_name) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter='\t')
+        for row in reader:
+            print row
+            tags[row['TAG']] = WordClass(row['DESCRIPTION'], format_colour(row['COLOUR']))
+    return tags
