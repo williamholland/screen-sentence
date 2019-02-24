@@ -28,6 +28,5 @@ def create_tags_from_csv(f_name):
     with open(f_name) as csvfile:
         reader = csv.DictReader(csvfile, delimiter='\t')
         for row in reader:
-            print row
             tags[row['TAG']] = WordClass(row['DESCRIPTION'], format_colour(row['COLOUR']))
     return tags

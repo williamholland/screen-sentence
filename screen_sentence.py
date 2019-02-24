@@ -260,12 +260,6 @@ def tags_post_processing(tags):
     return sum(sentences, [])
 
 
-def text_pre_processing(text):
-    if text and text[0].islower():
-        text = text[0].upper() + text[1:]
-    return text
-
-
 def get_tagged_words(text):
     ''' (str,) -> list of TaggedWord '''
 
@@ -320,6 +314,7 @@ class ScreenSentence(object):
     screen = pygame.display.set_mode(_size, pygame.RESIZABLE)
     screen.fill(WHITE)
     antialias = True
+    shift_lock = True
 
     def clear_text(self, event):
         ''' clear all text from the screen '''
@@ -327,10 +322,11 @@ class ScreenSentence(object):
 
     def clear_word(self, event):
         ''' clear last word '''
-        if ' ' not in self.text:
-            self.text = ''
+        tags = get_tagged_words(self.text)
+        if tags:
+            self.text = ''.join( t.word for t in tags[:-1])
         else:
-            self.text = self.text.rsplit(' ', 1)[0]
+            self.text = ''
 
     def backspace(self, event):
         ''' remove last character '''
@@ -340,10 +336,16 @@ class ScreenSentence(object):
     def toggle_fullscreen(self, event):
         self.fullscreen = not self.fullscreen
 
+    def escape(self, event):
+        if self.fullscreen:
+            self.toggle_fullscreen(event)
+        else:
+            exit(event)
+
     # functions to call when keys are pressed
     KEYBINDINGS = {
         pygame.K_BACKSPACE: backspace,
-        pygame.K_ESCAPE: exit,
+        pygame.K_ESCAPE: escape,
         pygame.K_F11: toggle_fullscreen,
     }
 
@@ -407,9 +409,19 @@ class ScreenSentence(object):
     def text(self):
         return self._text
 
+    def evaluate_shift_lock(self):
+        if not self.text.rstrip():
+            self.shift_lock = True
+            return
+
+        last_non_whitespace = self.text.rstrip()[-1]
+        if last_non_whitespace in '.?!':
+            self.shift_lock = True
+        else:
+            self.shift_lock = False
+
     @text.setter
     def text(self, value):
-        value = text_pre_processing(value)
         if value == self.text:
             return
 
@@ -424,10 +436,17 @@ class ScreenSentence(object):
     def display_key(self, event):
         ''' key pressed wants to be shown on the screen '''
 
-        self.text = self.text + event.unicode
+        if self.shift_lock:
+            key = event.unicode.upper()
+        else:
+            key = event.unicode
+
+        self.text = self.text + key
 
     def keydown(self, event):
         ''' when a key is pressed '''
+
+        self.evaluate_shift_lock()
 
         if event.key in self.KEYBINDINGS:
             self.KEYBINDINGS[event.key](event)

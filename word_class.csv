@@ -2,8 +2,8 @@ TAG	DESCRIPTION	COLOUR
 DEFAULT	default colour	205,200,177
 CC	coordinating conjunction	205,200,177
 CD	cardinal digit	205,200,177
-DT	determiner	238,59,59
-EX	existential there	238,59,60
+DT	determiner	255,106,106
+EX	existential there	255,106,106
 FW	foreign word	205,200,177
 IN	preposition/subordinating conjunction	255,127,36
 JJ	adjective (large)	114,159,207
@@ -23,7 +23,7 @@ RB	adverb (occasionally, swiftly)	173,127,168
 RBR	adverb, comparative (greater)	92,53,102
 RBS	adverb, superlative (biggest)	173,127,168
 RP	particle (about)	205,200,177
-TO	infinite marker (to)	255,20,147
+TO	infinite marker (to)	255,102,204
 UH	interjection (goodbye)	205,200,177
 VB	verb (ask)	118,238,0
 VBG	verb gerund (judging)	155,205,155
