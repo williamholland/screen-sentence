@@ -3,6 +3,8 @@ import sys
 import pygame
 import nltk
 import logging
+import inspect
+import types
 
 import word_class
 
@@ -27,11 +29,9 @@ def word_colour(tag):
 
 
 def exit(event):
+    ''' handle when the program exits '''
     sys.exit()
 
-
-def noop(*args, **kwargs):
-    pass
 
 def get_font(text):
     ''' (str,) -> (position, font)
@@ -51,7 +51,9 @@ def get_font(text):
 
     return position, font
 
+
 def log_tags(tags):
+    ''' take tags and log them in a compact way '''
     pretty_tags = ['{word}<{tag}>'.format(word=word, tag=tag) if len(tag) > 1 else word for word, tag in tags]
     logger.info( ' '.join(pretty_tags) )
 
@@ -70,16 +72,37 @@ class ScreenSentence(object):
         if self.text:
             self.text = self.text[:-1]
 
+    # functions to call when keys are pressed
     KEYBINDINGS = {
         pygame.K_BACKSPACE: backspace,
     }
 
+    # functions to call when keys are pressed with ctrl
     CTRL_KEYBINDINGS = {
         pygame.K_u: clear_text,
+        pygame.K_c: exit,
+        pygame.K_d: exit,
     }
 
     _text = ''
     antialias = True
+
+    def bind_keybindings(self):
+        ''' bind the functions specified in keybindings to this instance, deep
+            magic
+        '''
+        my_methods = [t[1] for t in inspect.getmembers(self, predicate=inspect.ismethod)]
+        for key, f in self.KEYBINDINGS.items():
+            bound_f = types.MethodType(f, self)
+            if bound_f in my_methods and bound_f not in self.KEYBINDINGS:
+                self.KEYBINDINGS[key] = bound_f
+        for key, f in self.CTRL_KEYBINDINGS.items():
+            bound_f = types.MethodType(f, self)
+            if bound_f in my_methods and bound_f not in self.CTRL_KEYBINDINGS:
+                self.CTRL_KEYBINDINGS[key] = bound_f
+
+    def __init__(self):
+        self.bind_keybindings()
 
     @property
     def text(self):
@@ -108,18 +131,24 @@ class ScreenSentence(object):
         ''' when a key is pressed '''
 
         if event.key in self.KEYBINDINGS:
-            self.KEYBINDINGS[event.key](self, event)
+            self.KEYBINDINGS[event.key](event)
         elif event.mod & pygame.KMOD_CTRL and event.key in self.CTRL_KEYBINDINGS:
-            self.CTRL_KEYBINDINGS[event.key](self, event)
+            self.CTRL_KEYBINDINGS[event.key](event)
         else:
             self.display_key(event)
 
     def resize(event):
+        ''' the window has been resized, redraw the display
+
+            note that this signal isn't always emmitted so appears buggy, this
+            is a fault of pygame version in debian
+        '''
         logger.info('resize %s', event.size)
         self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
         self.redraw()
 
     def redraw(self):
+        ''' update the display with the text '''
 
         self.screen.fill(WHITE)
 
@@ -151,6 +180,7 @@ class ScreenSentence(object):
 screen_sentence = ScreenSentence()
 
 
+# This is how the program handles
 EVENTS = {
     pygame.QUIT: exit,
     pygame.KEYDOWN: screen_sentence.keydown,
@@ -161,5 +191,6 @@ EVENTS = {
 pygame.display.update()
 while True:
     for event in pygame.event.get():
-        EVENTS.get(event.type, noop)(event)
+        if event.type in EVENTS:
+            EVENTS[event.type](event)
     pygame.display.update()
