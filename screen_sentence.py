@@ -221,12 +221,49 @@ def tags_post_processing__set_infinitive(tags):
     return tags
 
 
+def tags_post_processing__one_verb(tags):
+    if len([t for t in tags if t.tag == 'VB']) >= 1:
+        return tags
+
+    if len([t for t in tags if t.tag in VERB_TAGS]) > 1:
+        return tags
+
+    for tag in tags:
+        if tag.tag in VERB_TAGS:
+            tag.tag = 'VB'
+            break
+
+    return tags
+
+
+def split_to_sentences(tags):
+    sentences = []
+    sentence = []
+    for tag in tags:
+        sentence.append(tag)
+        if len(tag.tag) == 1:
+            sentences.append(sentence)
+            sentence = []
+    if sentence:
+        sentences.append(sentence)
+    return sentences
+
+
 def tags_post_processing(tags):
     ''' some custom logic for post procesing tags '''
-    tags = tags_post_processing__infinitive(tags)
-    tags = tags_post_processing__going_to(tags)
-    tags = tags_post_processing__set_infinitive(tags)
-    return tags
+    sentences = split_to_sentences(tags)
+    for sentence in sentences:
+        sentence = tags_post_processing__infinitive(sentence)
+        sentence = tags_post_processing__going_to(sentence)
+        sentence = tags_post_processing__set_infinitive(sentence)
+        sentence = tags_post_processing__one_verb(sentence)
+    return sum(sentences, [])
+
+
+def text_pre_processing(text):
+    if text and text[0].islower():
+        text = text[0].upper() + text[1:]
+    return text
 
 
 def get_tagged_words(text):
@@ -372,6 +409,7 @@ class ScreenSentence(object):
 
     @text.setter
     def text(self, value):
+        value = text_pre_processing(value)
         if value == self.text:
             return
 
