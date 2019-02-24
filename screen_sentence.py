@@ -21,7 +21,6 @@ screen.fill(WHITE)
 def word_colour(tag):
     ''' given a tag, find the colour for syntax hilighting '''
 
-    logger.info(tag)
     return word_class.TAGS.get(tag[1], word_class.DEFAULT).colour
 
 
@@ -39,10 +38,7 @@ def get_font(text):
         get the font, find the fontsize that will fill the screen
         get the position that will centre this text on the screen
     '''
-    #infoObject = pygame.display.Info()
-    #screen_w, screen_h = infoObject.current_w, infoObject.current_h
     screen_w, screen_h = pygame.display.get_surface().get_size()
-    logger.info( 'screen size: %s, %s', screen_w, screen_h)
     test_font = pygame.font.SysFont("LiberationSans", 10)
     ratio = (test_font.size(TEXT)[0] / float(len(TEXT))) / 10.0
     font_size = int(round(min((screen_w/ratio) / len(TEXT), screen_h )))
@@ -53,6 +49,10 @@ def get_font(text):
     position = (x, y)
 
     return position, font
+
+def log_tags(tags):
+    pretty_tags = ['{word}<{tag}>'.format(word=word, tag=tag) if len(tag) > 1 else word for word, tag in tags]
+    logger.info( ' '.join(pretty_tags) )
 
 CTRL_U = u'\x15'
 
@@ -70,6 +70,12 @@ def keydown(event):
         TEXT = ''
     else:
         TEXT = TEXT + event.unicode
+
+    # log if end of a word
+    if re.match('[.!?]', event.unicode):
+        tokens = nltk.word_tokenize(TEXT)
+        tags = nltk.pos_tag(tokens)
+        log_tags(tags)
 
     redraw()
 
