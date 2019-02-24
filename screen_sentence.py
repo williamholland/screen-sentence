@@ -186,7 +186,7 @@ class ScreenSentence(object):
         else:
             self.display_key(event)
 
-    def resize(event):
+    def resize(self, event):
         ''' the window has been resized, redraw the display
 
             note that this signal isn't always emmitted so appears buggy, this
