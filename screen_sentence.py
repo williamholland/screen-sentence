@@ -16,6 +16,8 @@ pygame.init()
 
 BLACK = 0,0,0
 WHITE = 255,255,255
+INFO_OBJECT = pygame.display.Info()
+MONITOR_SIZE = (INFO_OBJECT.current_w, INFO_OBJECT.current_h)
 
 TAGS = word_class.create_tags_from_csv('word_class.csv')
 
@@ -30,6 +32,7 @@ def word_colour(tag):
 
 def exit(event):
     ''' handle when the program exits '''
+    logger.info('exit gracefully. Goodbye.')
     sys.exit()
 
 
@@ -60,32 +63,46 @@ def log_tags(tags):
 
 class ScreenSentence(object):
 
-    screen = pygame.display.set_mode((600, 400), pygame.RESIZABLE)
+    _fullscreen = False
+    _text = ''
+    _size = (600, 400)
+    screen = pygame.display.set_mode(_size, pygame.RESIZABLE)
     screen.fill(WHITE)
+    antialias = True
 
     def clear_text(self, event):
         ''' clear all text from the screen '''
         self.text = ''
+
+    def clear_word(self, event):
+        ''' clear last word '''
+        if ' ' not in self.text:
+            self.text = ''
+        else:
+            self.text = self.text.rsplit(' ', 1)[0]
 
     def backspace(self, event):
         ''' remove last character '''
         if self.text:
             self.text = self.text[:-1]
 
+    def toggle_fullscreen(self, event):
+        self.fullscreen = not self.fullscreen
+
     # functions to call when keys are pressed
     KEYBINDINGS = {
         pygame.K_BACKSPACE: backspace,
+        pygame.K_ESCAPE: exit,
+        pygame.K_F11: toggle_fullscreen,
     }
 
     # functions to call when keys are pressed with ctrl
     CTRL_KEYBINDINGS = {
         pygame.K_u: clear_text,
+        pygame.K_w: clear_word,
         pygame.K_c: exit,
         pygame.K_d: exit,
     }
-
-    _text = ''
-    antialias = True
 
     def bind_keybindings(self):
         ''' bind the functions specified in keybindings to this instance, deep
@@ -103,6 +120,37 @@ class ScreenSentence(object):
 
     def __init__(self):
         self.bind_keybindings()
+
+    @property
+    def fullscreen(self):
+        return self._fullscreen
+
+    @fullscreen.setter
+    def fullscreen(self, value):
+        if value == self._fullscreen:
+            return
+
+        self._fullscreen = value
+        if self._fullscreen:
+            logger.info('fullscreen activated')
+            self.screen = pygame.display.set_mode(MONITOR_SIZE, pygame.FULLSCREEN)
+        else:
+            logger.info('fullscreen deactivated')
+            self.screen = pygame.display.set_mode(self.size, pygame.RESIZABLE)
+
+        self.redraw()
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        if value == self._size:
+            return
+        self._size = value
+        self.screen = pygame.display.set_mode(self.size, pygame.RESIZABLE)
+        self.redraw()
 
     @property
     def text(self):
@@ -144,8 +192,7 @@ class ScreenSentence(object):
             is a fault of pygame version in debian
         '''
         logger.info('resize %s', event.size)
-        self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
-        self.redraw()
+        self.size = event.size
 
     def redraw(self):
         ''' update the display with the text '''
