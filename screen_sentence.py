@@ -5,12 +5,16 @@ import nltk
 import logging
 import inspect
 import types
+from nltk.stem.wordnet import WordNetLemmatizer
 
 import word_class
 
 logging.basicConfig(format='%(asctime)s File %(name)s, line %(lineno)d, %(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
+
+# This is slow to load... add a splash screen
+WordNetLemmatizer().lemmatize('lagged','v')
 
 pygame.init()
 pygame.display.set_caption('Screen Sentence')
@@ -20,6 +24,76 @@ WHITE = 255,255,255
 INFO_OBJECT = pygame.display.Info()
 MONITOR_SIZE = (INFO_OBJECT.current_w, INFO_OBJECT.current_h)
 
+INFINITAL_VERBS = [
+    "advise",
+    "agree",
+    "allow",
+    "arrange",
+    "ask",
+    "attempt",
+    "choose",
+    "decide",
+    "enable",
+    "encourage",
+    "expect",
+    "fail",
+    "force",
+    "forget",
+    "get",
+    "hate",
+    "help",
+    "hope",
+    "intend",
+    "invite",
+    "learn",
+    "like",
+    "live",
+    "love",
+    "manage",
+    "mean",
+    "order",
+    "persuade",
+    "plan",
+    "prefer",
+    "promise",
+    "refuse",
+    "remember",
+    "remind",
+    "teach",
+    "tell",
+    "tend",
+    "try",
+    "want",
+    "warn",
+]
+
+NOUN_TAGS = [
+    "NN",
+    "NNS",
+    "NNP",
+    "NNPS",
+    "PDT",
+    "POS",
+    "PRP",
+    "PRP$",
+]
+
+# excludes modal
+VERB_TAGS = [
+    "VB",
+    "VBG",
+    "VBD",
+    "VBN",
+    "VBP",
+    "VBZ",
+]
+
+ADVERT_TAGS = [
+    "RB",
+    "RBR",
+    "RBS",
+]
+
 TAGS = word_class.create_tags_from_csv('word_class.csv')
 
 class TaggedWord(object):
@@ -27,17 +101,34 @@ class TaggedWord(object):
     word = None
     _tagged_word = None
     whitespace = ''
-    tag = None
+    _tag = None
+    _base = None
     colour = None
 
     @property
     def word(self):
         return '{word}{whitespace}'.format(word=self._tagged_word, whitespace=self.whitespace)
 
+    @property
+    def tag(self):
+        return self._tag
+
+    @tag.setter
+    def tag(self, value):
+        if value == self._tag:
+            return
+        self._tag = value
+        self.colour = self.get_colour()
+
+    @property
+    def base(self):
+        if not self._base:
+            self._base = WordNetLemmatizer().lemmatize(self._tagged_word,'v')
+        return self._base
+
     def __init__(self, tag, whitespace=''):
         self._tagged_word, self.tag = tag
         self.whitespace = whitespace
-        self.colour = self.get_colour()
 
     def __str__(self):
         if len(self.tag) > 1:
@@ -57,6 +148,55 @@ class TaggedWord(object):
             return BLACK
 
 
+def tags_post_processing__infinitive(tags):
+    ''' TO can be an infinital marker or preposition
+
+        The tagging is unreliable in the case of tagging the verb so we
+        will use logic on TO to determine if we have an infinitive.
+
+        we assume TO is a preposition unless:
+        * it's the first word
+        * it's the last word
+        * it is followed by an adverb
+        * it is not proceeded by a verb that is not modal
+        * it is proceeded a whitelisted word (see INFINITAL_VERBS)
+    '''
+    def adverb_check(i):
+        '''find the mistragged word after the adverb phrase'''
+        for t in tags[i:]:
+            if t.tag in VERB_TAGS+NOUN_TAGS:
+                t.tag = 'VB'
+                return
+
+    for i, tag in enumerate(tags):
+        if tag.tag != 'TO':
+            continue
+
+        if i == 0:
+            tag.tag = 'TO'
+            adverb_check(0)
+        elif i+1 == len(tags):
+            tag.tag = 'TO'
+        elif tags[i+1].tag in ADVERT_TAGS:
+            tag.tag = 'TO'
+            adverb_check(i)
+        elif tags[i-1].tag not in VERB_TAGS:
+            tag.tag = 'TO'
+            tags[i+1].tag = 'VB'
+        elif tags[i-1].base in INFINITAL_VERBS:
+            tag.tag = 'TO'
+            tags[i+1].tag = 'VB'
+        else:
+            tag.tag = 'IN'
+    return tags
+
+
+def tags_post_processing(tags):
+    ''' some custom logic for post procesing tags '''
+    tags = tags_post_processing__infinitive(tags)
+    return tags
+
+
 def get_tagged_words(text):
     ''' (str,) -> list of TaggedWord '''
 
@@ -73,7 +213,9 @@ def get_tagged_words(text):
         whitespace.append(w)
         total = total + token + w
 
-    return [TaggedWord(tag, whitespace=w) for tag, w in zip(tags, whitespace)]
+    tags = [TaggedWord(tag, whitespace=w) for tag, w in zip(tags, whitespace)]
+    tags = tags_post_processing(tags)
+    return tags
 
 
 def exit(event):
