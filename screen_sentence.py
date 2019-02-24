@@ -102,6 +102,7 @@ class TaggedWord(object):
     _tagged_word = None
     whitespace = ''
     _tag = None
+    original_tag = None
     _base = None
     colour = None
 
@@ -127,7 +128,8 @@ class TaggedWord(object):
         return self._base
 
     def __init__(self, tag, whitespace=''):
-        self._tagged_word, self.tag = tag
+        self._tagged_word, self.original_tag = tag
+        self.tag = self.original_tag
         self.whitespace = whitespace
 
     def __str__(self):
@@ -158,42 +160,72 @@ def tags_post_processing__infinitive(tags):
         * it's the first word
         * it's the last word
         * it is followed by an adverb
-        * it is not proceeded by a verb that is not modal
         * it is proceeded a whitelisted word (see INFINITAL_VERBS)
     '''
+    for i, tag in enumerate(tags):
+        if tag.original_tag != 'TO':
+            continue
+
+        if i == 0:
+            tag.tag = 'TO'
+        elif i+1 == len(tags):
+            tag.tag = 'TO'
+        elif tags[i+1].original_tag in ADVERT_TAGS:
+            tag.tag = 'TO'
+        elif tags[i-1].base in INFINITAL_VERBS:
+            tag.tag = 'TO'
+            tags[i+1].tag = 'TO'
+        else:
+            tag.tag = 'IN'
+    return tags
+
+def tags_post_processing__going_to(tags):
+    ''' grammar of the form
+
+        subject + to be + to go + infinitive
+
+    '''
+
+    for i, tag in enumerate(tags):
+        if tag.original_tag != 'TO':
+            continue
+
+        if i == 0:
+            continue
+        elif i+1 == len(tags):
+            continue
+        elif tags[i-1].base == 'go' and tags[i+1].original_tag in VERB_TAGS:
+            tag.tag = 'TO'
+    return tags
+
+
+def tags_post_processing__set_infinitive(tags):
+    ''' set any TO+VB to both have TO tag '''
+
     def adverb_check(i):
         '''find the mistragged word after the adverb phrase'''
         for t in tags[i:]:
-            if t.tag in VERB_TAGS+NOUN_TAGS:
-                t.tag = 'VB'
+            if t.original_tag in VERB_TAGS+NOUN_TAGS:
+                t.tag = 'TO'
                 return
 
     for i, tag in enumerate(tags):
         if tag.tag != 'TO':
             continue
-
-        if i == 0:
-            tag.tag = 'TO'
-            adverb_check(0)
         elif i+1 == len(tags):
-            tag.tag = 'TO'
-        elif tags[i+1].tag in ADVERT_TAGS:
-            tag.tag = 'TO'
+            continue
+        elif tags[i+1].original_tag in ADVERT_TAGS:
             adverb_check(i)
-        elif tags[i-1].tag not in VERB_TAGS:
-            tag.tag = 'TO'
-            tags[i+1].tag = 'VB'
-        elif tags[i-1].base in INFINITAL_VERBS:
-            tag.tag = 'TO'
-            tags[i+1].tag = 'VB'
-        else:
-            tag.tag = 'IN'
+        if tags[i+1].original_tag in VERB_TAGS+NOUN_TAGS:
+            tags[i+1].tag = 'TO'
     return tags
 
 
 def tags_post_processing(tags):
     ''' some custom logic for post procesing tags '''
     tags = tags_post_processing__infinitive(tags)
+    tags = tags_post_processing__going_to(tags)
+    tags = tags_post_processing__set_infinitive(tags)
     return tags
 
 
