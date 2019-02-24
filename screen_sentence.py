@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel('DEBUG')
 
 pygame.init()
+pygame.display.set_caption('Screen Sentence')
 
 BLACK = 0,0,0
 WHITE = 255,255,255
