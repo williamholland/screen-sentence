@@ -436,10 +436,12 @@ class ScreenSentence(object):
     def display_key(self, event):
         ''' key pressed wants to be shown on the screen '''
 
+        key = event.unicode
+
         if self.shift_lock:
-            key = event.unicode.upper()
-        else:
-            key = event.unicode
+            key = key.upper()
+            if self.text and key != ' ' and self.text[-1] in '.?!':
+                self.text = self.text + ' '
 
         self.text = self.text + key
 
