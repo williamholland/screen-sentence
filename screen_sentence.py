@@ -22,13 +22,58 @@ MONITOR_SIZE = (INFO_OBJECT.current_w, INFO_OBJECT.current_h)
 
 TAGS = word_class.create_tags_from_csv('word_class.csv')
 
-def word_colour(tag):
-    ''' given a tag, find the colour for syntax hilighting '''
+class TaggedWord(object):
 
-    try:
-        return TAGS.get(tag[1], TAGS['DEFAULT']).colour
-    except KeyError:
-        return BLACK
+    word = None
+    _tagged_word = None
+    whitespace = ''
+    tag = None
+    colour = None
+
+    @property
+    def word(self):
+        return '{word}{whitespace}'.format(word=self._tagged_word, whitespace=self.whitespace)
+
+    def __init__(self, tag, whitespace=''):
+        self._tagged_word, self.tag = tag
+        self.whitespace = whitespace
+        self.colour = self.get_colour()
+
+    def __str__(self):
+        if len(self.tag) > 1:
+            return '<{tag}>{word}'.format(tag=self.tag, word=self.word)
+        else:
+            return self.word
+
+    def __repr__(self):
+        return '<TaggedWord word=%s tag=%s>' % (repr(self.word), repr(self.tag))
+
+    def get_colour(self):
+        ''' given a tag, find the colour for syntax hilighting '''
+
+        try:
+            return TAGS.get(self.tag, TAGS['DEFAULT']).colour
+        except KeyError:
+            return BLACK
+
+
+def get_tagged_words(text):
+    ''' (str,) -> list of TaggedWord '''
+
+    tokens = nltk.word_tokenize(text)
+    tags = nltk.pos_tag(tokens)
+
+    # tokenize removes spaces, we still want to see them on the screen so add
+    # to the left
+    whitespace = []
+    total = ''
+    for token in tokens:
+        match = re.match(re.escape(total)+re.escape(token)+'(\s*)', text)
+        w = match.groups()[0]
+        whitespace.append(w)
+        total = total + token + w
+
+    return [TaggedWord(tag, whitespace=w) for tag, w in zip(tags, whitespace)]
 
 
 def exit(event):
@@ -54,12 +99,6 @@ def get_font(text):
     position = (x, y)
 
     return position, font
-
-
-def log_tags(tags):
-    ''' take tags and log them in a compact way '''
-    pretty_tags = ['{word}<{tag}>'.format(word=word, tag=tag) if len(tag) > 1 else word for word, tag in tags]
-    logger.info( ' '.join(pretty_tags) )
 
 
 class ScreenSentence(object):
@@ -167,9 +206,8 @@ class ScreenSentence(object):
 
         # log if end of a word
         if re.match('[.!?]', event.unicode):
-            tokens = nltk.word_tokenize(self.text)
-            tags = nltk.pos_tag(tokens)
-            log_tags(tags)
+            words = get_tagged_words(self.text)
+            logger.info(''.join(str(word) for word in words))
 
     def display_key(self, event):
         ''' key pressed wants to be shown on the screen '''
@@ -205,24 +243,13 @@ class ScreenSentence(object):
 
         position, font = get_font(self.text)
 
-        tokens = nltk.word_tokenize(self.text)
-        tags = nltk.pos_tag(tokens)
-
-        # add back spaces that tokenize removed
-        words = []
-        total = ''
-        for i, token in enumerate(tokens):
-            if re.match(re.escape(total)+re.escape(token)+' ', self.text):
-                token = token + ' '
-            words.append(token)
-            total = total+token
-
+        # render text word by word
         prev_word_end = position[0]
-        for word, tag in zip(words, tags):
-            label = font.render(word, self.antialias, word_colour(tag))
+        for word in get_tagged_words(self.text):
+            label = font.render(word.word, self.antialias, word.colour)
             word_position = (prev_word_end, position[1])
             self.screen.blit(label, word_position)
-            prev_word_end += font.size(word)[0]
+            prev_word_end += font.size(word.word)[0]
 
 
 screen_sentence = ScreenSentence()
