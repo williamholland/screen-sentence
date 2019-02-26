@@ -293,14 +293,25 @@ def get_font(text):
         get the font, find the fontsize that will fill the screen
         get the position that will centre this text on the screen
     '''
+
+    LINE_HEIGHT = 1.25
+
     screen_w, screen_h = pygame.display.get_surface().get_size()
+
+    lines = text.split('\r')
+
     test_font = pygame.font.SysFont("LiberationSans", 10)
-    ratio = (test_font.size(text)[0] / float(len(text))) / 10.0
-    font_size = int(round(min((screen_w/ratio) / len(text), screen_h )))
+
+    max_line = max( lines, key=lambda l: len(l))
+
+    # ratio of font width to height
+    ratio = (test_font.size(max_line)[0] / float(len(max_line))) / 10.0
+
+    font_size = int(round(min((screen_w/ratio) / len(max_line), screen_h / float(len(lines) * LINE_HEIGHT) )))
     font = pygame.font.SysFont("LiberationSans", font_size)
 
-    x = int(round((screen_w - font.size(text)[0]) / 2.0))
-    y = int(round(((screen_h - font.size(text)[1]) / 2.0)))
+    x = max(0, int(round((screen_w - font.size(max_line)[0]) / 2.0)))
+    y = max(0, int(round(((screen_h - (len(lines) * font.size(text)[1])) / 2.0))))
     position = (x, y)
 
     return position, font
@@ -440,7 +451,7 @@ class ScreenSentence(object):
 
         if self.shift_lock:
             key = key.upper()
-            if self.text and key != ' ' and self.text[-1] in '.?!':
+            if self.text and key not in  [' ', '\r'] and self.text[-1] in '.?!':
                 self.text = self.text + ' '
 
         self.text = self.text + key
@@ -474,15 +485,21 @@ class ScreenSentence(object):
         if not self.text:
             return
 
+        lines = self.text.split('\r')
+
         position, font = get_font(self.text)
 
-        # render text word by word
-        prev_word_end = position[0]
-        for word in get_tagged_words(self.text):
-            label = font.render(word.word, self.antialias, word.colour)
-            word_position = (prev_word_end, position[1])
-            self.screen.blit(label, word_position)
-            prev_word_end += font.size(word.word)[0]
+        prev_line_end = position[1]
+        for line in lines:
+            if line:
+                # render text word by word
+                prev_word_end = position[0]
+                for word in get_tagged_words(line):
+                    label = font.render(word.word, self.antialias, word.colour)
+                    word_position = (prev_word_end, prev_line_end)
+                    self.screen.blit(label, word_position)
+                    prev_word_end += font.size(word.word)[0]
+            prev_line_end += font.size('I')[1]
 
 
 screen_sentence = ScreenSentence()
