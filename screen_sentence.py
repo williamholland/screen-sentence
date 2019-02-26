@@ -303,15 +303,19 @@ def get_font(text):
 
     test_font = pygame.font.SysFont("LiberationSans", 10)
 
-    max_line = max( lines, key=lambda l: len(l))
+    max_line = max(lines, key=lambda l: len(l))
 
     # ratio of font width to height
     ratio = (test_font.size(max_line)[0] / float(len(max_line))) / 10.0
 
+    # find largest font that will fit on screen
     font_size = int(round(min((screen_w/ratio) / len(max_line), screen_h / float(len(lines) * LINE_HEIGHT) )))
     font = pygame.font.SysFont("LiberationSans", font_size)
 
-    x = max(0, int(round((screen_w - font.size(max_line)[0]) / 2.0)))
+    max_line_length = max( font.size(l)[0] for l in lines )
+
+    # find x and y to centre the text
+    x = max(0, int(round((screen_w - max_line_length) / 2.0)))
     y = max(0, int(round(((screen_h - (len(lines) * font.size(text)[1])) / 2.0))))
     position = (x, y)
 
