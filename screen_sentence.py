@@ -51,6 +51,7 @@ INFINITAL_VERBS = [
     "love",
     "manage",
     "mean",
+    "need",
     "order",
     "persuade",
     "plan",
