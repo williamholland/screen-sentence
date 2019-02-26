@@ -27,4 +27,4 @@ colours as shown in the table below.
 
 ## TODO
 
-* multi-line
+* manual adjustments
