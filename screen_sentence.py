@@ -456,8 +456,12 @@ class ScreenSentence(object):
 
         if self.shift_lock:
             key = key.upper()
-            if self.text and key not in  [' ', '\r'] and self.text[-1] in '.?!':
-                self.text = self.text + ' '
+        else:
+            if key.isupper() and self.text and self.text[-1] not in list(' \r'):
+                key = key.lower()
+
+        if self.text and self.text[-1] in '.?!' and self.text and key not in list(' \r.!?'):
+            self.text = self.text + ' '
 
         self.text = self.text + key
 
@@ -470,7 +474,7 @@ class ScreenSentence(object):
             self.KEYBINDINGS[event.key](event)
         elif event.mod & pygame.KMOD_CTRL and event.key in self.CTRL_KEYBINDINGS:
             self.CTRL_KEYBINDINGS[event.key](event)
-        else:
+        elif event.unicode:
             self.display_key(event)
 
     def resize(self, event):
