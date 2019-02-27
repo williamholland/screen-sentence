@@ -5,7 +5,7 @@ CD	cardinal digit	205,200,177
 DT	determiner	255,106,106
 EX	existential there	255,106,106
 FW	foreign word	205,200,177
-IN	preposition/subordinating conjunction	255,127,36
+IN	preposition/subordinating conjunction	255,215,76
 JJ	adjective (large)	114,159,207
 JJR	adjective, comparative (larger)	32,74,135
 JJS	adjective, superlative (largest)	114,159,207
