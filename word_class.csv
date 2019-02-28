@@ -1,36 +1,36 @@
-TAG	DESCRIPTION	COLOUR
-DEFAULT	default colour	205,200,177
-CC	coordinating conjunction	205,200,177
-CD	cardinal digit	205,200,177
-DT	determiner	255,106,106
-EX	existential there	255,106,106
-FW	foreign word	205,200,177
-IN	preposition/subordinating conjunction	255,215,76
-JJ	adjective (large)	114,159,207
-JJR	adjective, comparative (larger)	32,74,135
-JJS	adjective, superlative (largest)	114,159,207
-LS	list market	205,200,177
-MD	modal (could, will)	155,205,155
-NN	noun, singular (cat, tree)	255,64,64
-NNS	noun plural (desks)	255,64,64
-NNP	proper noun, singular (sarah)	255,64,64
-NNPS	proper noun, plural (indians or americans)	255,64,64
-PDT	predeterminer (all, both, half)	205,200,177
-POS	possessive ending (parent's)	255,106,106
-PRP	personal pronoun (hers, herself, him,himself)	255,106,106
-PRP$	possessive pronoun (her, his, mine, my, our )	255,106,106
-RB	adverb (occasionally, swiftly)	173,127,168
-RBR	adverb, comparative (greater)	92,53,102
-RBS	adverb, superlative (biggest)	173,127,168
-RP	particle (about)	205,200,177
-TO	infinite marker (to)	255,102,204
-UH	interjection (goodbye)	205,200,177
-VB	verb (ask)	118,238,0
-VBG	verb gerund (judging)	155,205,155
-VBD	verb past tense (pleaded)	155,205,155
-VBN	verb past participle (reunified)	155,205,155
-VBP	verb, present tense not 3rd person singular(wrap)	155,205,155
-VBZ	verb, present tense with 3rd person singular (bases)	155,205,155
-WDT	wh-determiner (that, what)	255,106,106
-WP	wh- pronoun (who)	255,106,106
-WRB	wh- adverb (how) 	155,205,155
+TAG	DESCRIPTION	COLOUR		
+DEFAULT	default colour	85,87,83		
+CC	coordinating conjunction	85,87,83		
+CD	cardinal digit	85,87,83		
+DT	determiner	51,195,193		
+EX	existential there	51,195,193		
+FW	foreign word	85,87,86		
+IN	preposition/subordinating conjunction	250,112,29		0,0,0
+JJ	adjective (large)	159,0,189		248,40,42
+JJR	adjective, comparative (larger)	159,0,189		50,138,93
+JJS	adjective, superlative (largest)	159,0,189		250,112,29
+LS	list market	85,87,91		19,92,208
+MD	modal (could, will)	44,198,49		159,0,189
+NN	noun, singular (cat, tree)	19,92,208		51,195,193
+NNS	noun plural (desks)	19,92,208		179,179,179
+NNP	proper noun, singular (sarah)	19,92,208		85,87,83
+NNPS	proper noun, plural (indians or americans)	19,92,208		251,4,22
+PDT	predeterminer (all, both, half)	248,40,42		44,198,49
+POS	possessive ending (parent's)	22,112,255		253,215,39
+PRP	personal pronoun (hers, herself, him,himself)	22,112,255		22,112,255
+PRP$	possessive pronoun (her, his, mine, my, our )	22,112,255		233,0,176
+RB	adverb (occasionally, swiftly)	50,138,93		58,213,206
+RBR	adverb, comparative (greater)	50,138,93		238,238,236
+RBS	adverb, superlative (biggest)	50,138,93		
+RP	particle (about)	85,87,104		
+TO	infinite marker (to)	44,198,49		
+UH	interjection (goodbye)	85,87,106		
+VB	verb (ask)	44,198,49		
+VBG	verb gerund (judging)	44,198,49		
+VBD	verb past tense (pleaded)	44,198,49		
+VBN	verb past participle (reunified)	44,198,49		
+VBP	verb, present tense not 3rd person singular(wrap)	44,198,49		
+VBZ	verb, present tense with 3rd person singular (bases)	85,87,112		
+WDT	wh-determiner (that, what)	85,87,113		
+WP	wh- pronoun (who)	85,87,114		
+WRB	wh- adverb (how) 	50,138,93		
